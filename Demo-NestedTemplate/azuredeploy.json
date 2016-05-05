@@ -41,6 +41,9 @@
         "description": "T-shirt size of the VM deployment"
       }
     },
+    "containerSasToken" : {
+      "type": "string"
+    },
     "virtualNetworkName": {
       "type": "string",
       "defaultValue": "vnet",
@@ -51,11 +54,11 @@
   },
   "variables": {
     "templateBaseUrl": "https://collierstirtrek.blob.core.windows.net/templates/",
-    "sharedTemplateUrl": "[concat(variables('templateBaseUrl'), 'shared-resources.json')]",
+    "sharedTemplateUrl": "[concat(variables('templateBaseUrl'), 'shared-resources.json', parameters('containerSasToken'))]",
     "tshirtSizeSmall": {
       "vmSize": "Standard_A1",
       "diskSize": 1023,
-      "vmTemplate": "[concat(variables('templateBaseUrl'), '2disk-resources.json')]",
+      "vmTemplate": "[concat(variables('templateBaseUrl'), '2disk-resources.json', parameters('containerSasToken'))]",
       "vmCount": 2,
       "storage": {
         "name": "[variables('storageAccountNameBase')]",
@@ -69,7 +72,7 @@
     "tshirtSizeMedium": {
       "vmSize": "Standard_D3",
       "diskSize": 1023,
-      "vmTemplate": "[concat(variables('templateBaseUrl'), '8disk-resources.json')]",
+      "vmTemplate": "[concat(variables('templateBaseUrl'), '8disk-resources.json', parameters('containerSasToken'))]",
       "vmCount": 4,
       "storage": {
         "name": "[variables('storageAccountNameBase')]",
@@ -84,7 +87,7 @@
     "tshirtSizeLarge": {
       "vmSize": "Standard_D4v2",
       "diskSize": 1023,
-      "vmTemplate": "[concat(variables('templateBaseUrl'), '16disk-resources.json')]",
+      "vmTemplate": "[concat(variables('templateBaseUrl'), '16disk-resources.json', parameters('containerSasToken'))]",
       "vmCount": 6,
       "storage": {
         "name": "[variables('storageAccountNameBase')]",

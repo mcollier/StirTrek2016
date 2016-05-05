@@ -5,8 +5,21 @@
 $location = "northcentralus"
 $resourceGroupName = "stirtrek2016-nested"
 
+$templateStorageAccountName = "collierstirtrek"
+$templateStorageAccountResourceGroupName = "stirtrek2016"
+
 $templateFile = "C:\Users\mcollier\Dropbox\Presentations\Work on Your ARM Strength\StirTrek 2016\Demo-NestedTemplate\azuredeploy.json"
 $templateParamFile = "C:\Users\mcollier\Dropbox\Presentations\Work on Your ARM Strength\StirTrek 2016\Demo-NestedTemplate\azuredeploy.parameters.json"
+
+$ctx = New-AzureStorageContext -StorageAccountName $templateStorageAccountName `
+                               -StorageAccountKey (Get-AzureRmStorageAccountKey -ResourceGroupName $templateStorageAccountResourceGroupName `
+                                                                                -Name $templateStorageAccountName).Key1
+$containerSasToken = (New-AzureStorageContainerSASToken -Container templates `
+                                                        -Permission r `
+                                                        -Protocol HttpsOnly `
+                                                        -StartTime (Get-Date).AddMinutes(-2) `
+                                                        -ExpiryTime (Get-Date).AddMinutes(15) `
+                                                        -Context $ctx)
 
 New-AzureRmResourceGroup -Name $resourceGroupName -Location $location
 
@@ -16,6 +29,7 @@ Test-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName `
                                     -TemplateFile $templateFile `
                                     -adminPassword $cred.Password `
                                     -adminUsername $cred.UserName `
+                                    -containerSasToken $containerSasToken `
                                     -TemplateParameterFile $templateParamFile -Mode Incremental -Verbose -Debug
 
 New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName `
@@ -24,6 +38,7 @@ New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName `
                                    -Name "nested-example" `
                                    -adminPassword $cred.Password `
                                    -adminUsername $cred.UserName `
+                                   -containerSasToken $containerSasToken `
                                    -DeploymentDebugLogLevel All `
                                    -Verbose
 
