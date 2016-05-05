@@ -1,0 +1,21 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "dnsLabelPrefix": {
+      "value": "stirtrek2016"
+    },
+    "vmName": {
+      "value": "rdpVM"
+    },
+    "adminUsername": {
+      "value": "mcollier"
+    },
+    "adminPassword": {
+      "value": "test!123"
+    },
+    "rdpPort": {
+      "value": 50001
+    }
+  }
+}

@@ -1,0 +1,18 @@
+ {
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "region": {
+            "value": "eastus"
+        },
+        "storageAccountNamePrefix": {
+            "value": "st2016"
+        },
+        "tshirtSize": {
+            "value": "Small"      
+        },
+        "virtualNetworkName": {
+            "value": "st2016vnet"
+     }
+    }
+ }

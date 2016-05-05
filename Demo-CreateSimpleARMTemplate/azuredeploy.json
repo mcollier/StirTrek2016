@@ -1,0 +1,70 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#", 
+ 	"contentVersion": "1.0.0.0", 
+     "parameters": {
+         "appServicePlanName":{
+             "type": "string"
+         },
+         "appServicePlanTier":{
+             "type": "string",
+             "defaultValue": "Free",
+             "allowedValues": [
+                 "Free",
+                 "Basic",
+                 "Standard"
+             ]
+         },
+         "appServicePlanSize":{
+             "type": "string",
+             "defaultValue": "F1",
+             "allowedValues": [
+                 "F1",
+                 "D1",
+                 "B1",
+                 "B2",
+                 "B3",
+                 "S1",
+                 "S2",
+                 "S3"
+             ]
+         },
+         "webAppName":{
+             "type": "string"
+         }
+     },
+     "variables": {
+         
+     },
+     "resources": [
+         {
+             "apiVersion": "2015-08-01",
+             "name": "[parameters('webAppName')]",
+             "type": "Microsoft.Web/sites",
+             "location": "[resourceGroup().location]",
+             "tags": {
+                 "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]": "Resource",
+                 "displayName": "[parameters('webAppName')]"
+             },
+             "dependsOn": [
+                 "[concat('Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]"
+             ],
+             "properties": {
+                 "name": "[parameters('webAppName')]",
+                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]"
+             }
+         },
+         {
+              "apiVersion": "2015-08-01",
+              "type": "Microsoft.Web/serverfarms",
+              "name": "[parameters('appServicePlanName')]",
+              "location": "[resourceGroup().location]",
+              "sku": {
+                  "name": "[parameters('appServicePlanSize')]",
+                  "tier": "[parameters('appServicePlanTier')]",
+                  "capacity": 1
+              },
+              "properties": {
+              }
+         }     
+     ]
+}

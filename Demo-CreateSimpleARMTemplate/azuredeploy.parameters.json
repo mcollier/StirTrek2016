@@ -1,0 +1,18 @@
+ {
+     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+         "appServicePlanName":{
+             "value": "stirtrek2016plan1"
+         },
+         "appServicePlanTier":{
+             "value": "Basic"
+         },
+         "appServicePlanSize":{
+             "value": "B1"
+         },
+         "webAppName":{
+             "value": "stirtrek2016site"
+         }
+     }
+ }

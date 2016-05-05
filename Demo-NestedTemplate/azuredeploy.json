@@ -1,0 +1,197 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "region": {
+      "type": "string",
+      "allowedValues": [
+        "westus",
+        "eastus"
+      ],
+      "metadata": {
+        "description": "Location of the resource group and all contained resources"
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "defaultValue": "mcollier",
+      "metadata": {
+        "description": "Virtual machine administrator username"
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Virtual machine administrator password"
+      }
+    },
+    "storageAccountNamePrefix": {
+      "type": "string"
+    },
+    "tshirtSize": {
+      "type": "string",
+      "defaultValue": "Small",
+      "allowedValues": [
+        "Small",
+        "Medium",
+        "Large",
+        "XLarge"
+      ],
+      "metadata": {
+        "description": "T-shirt size of the VM deployment"
+      }
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "vnet",
+      "metadata": {
+        "description": "Virtual network name"
+      }
+    }
+  },
+  "variables": {
+    "templateBaseUrl": "https://collierstirtrek.blob.core.windows.net/templates/",
+    "sharedTemplateUrl": "[concat(variables('templateBaseUrl'), 'shared-resources.json')]",
+    "tshirtSizeSmall": {
+      "vmSize": "Standard_A1",
+      "diskSize": 1023,
+      "vmTemplate": "[concat(variables('templateBaseUrl'), '2disk-resources.json')]",
+      "vmCount": 2,
+      "storage": {
+        "name": "[variables('storageAccountNameBase')]",
+        "count": 1,
+        "map": [
+          0,
+          0
+        ]
+      }
+    },
+    "tshirtSizeMedium": {
+      "vmSize": "Standard_D3",
+      "diskSize": 1023,
+      "vmTemplate": "[concat(variables('templateBaseUrl'), '8disk-resources.json')]",
+      "vmCount": 4,
+      "storage": {
+        "name": "[variables('storageAccountNameBase')]",
+        "count": 2,
+        "map": [
+          0,
+          0,
+          1
+        ]
+      }
+    },
+    "tshirtSizeLarge": {
+      "vmSize": "Standard_D4v2",
+      "diskSize": 1023,
+      "vmTemplate": "[concat(variables('templateBaseUrl'), '16disk-resources.json')]",
+      "vmCount": 6,
+      "storage": {
+        "name": "[variables('storageAccountNameBase')]",
+        "count": 2,
+        "map": [
+          0,
+          1,
+          0,
+          1,
+          0,
+          1
+        ]
+      }
+    },
+    "tshirtSize": "[variables(concat('tshirtSize', parameters('tshirtSize')))]",
+    "storageAccountNameBase" : "[concat(parameters('storageAccountNamePrefix'), uniqueString(resourceGroup().id))]",
+    "osSettings": {
+      "publisher": "MicrosoftWindowsServer",
+      "offer": "WindowsServer",
+      "sku": "2012-R2-Datacenter",
+      "version": "latest"
+    },
+    "networkSettings": {
+      "vnetName": "[parameters('virtualNetworkName')]",
+      "addressPrefix": "10.0.0.0/16",
+      "subnets": {
+        "data": {
+          "name": "data",
+          "prefix": "10.0.0.0/24",
+          "vnet": "[parameters('virtualNetworkName')]"
+        }
+      }
+    },
+    "availabilitySetSettings": {
+      "name": "MyVMAvailabilitySet",
+      "fdCount": 3,
+      "udCount": 5
+    }
+  },
+  "resources": [
+    {
+      "name": "shared",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('sharedTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "storageSettings": {
+            "value": "[variables('tshirtSize').storage]"
+          },
+          "region": {
+            "value": "[parameters('region')]"
+          },
+          "networkSettings": {
+            "value": "[variables('networkSettings')]"
+          },
+          "availabilitySetSettings": {
+            "value": "[variables('availabilitySetSettings')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "workers",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/', 'shared')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('tshirtSize').vmTemplate]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminPassword":{
+            "value": "[parameters('adminPassword')]"
+          },
+          "osSettings":{
+            "value": "[variables('osSettings')]"
+          },
+          "subnet" : {
+            "value": "[variables('networkSettings').subnets.data]"
+          },
+          "commonSettings":{
+            "value": {
+              "region":"[parameters('region')]",
+              "adminUsername" : "[parameters('adminUsername')]",
+              "namespace": "st2016"
+            }
+          },
+          "storageSettings" : {
+            "value": "[variables('tshirtSize').storage]"
+          },
+          "machineSettings" : {
+            "value": {
+              "vmSize": "[variables('tshirtSize').vmSize]",
+              "availabilitySet" : "[variables('availabilitySetSettings').name]"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

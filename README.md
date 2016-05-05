@@ -1,0 +1,2 @@
+## StirTrek 2016
+This respository contains the presentation and samples / demos used in my presentation at StirTrek 2016. The content here should not be considered even close to production quality. It could very much be improved!

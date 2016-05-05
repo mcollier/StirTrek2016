@@ -1,0 +1,124 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#", 
+    "contentVersion": "1.0.0.0", 
+    "parameters": {
+        "osSettings":{ "type": "object"},
+        "adminPassword" : {"type": "securestring"},
+        "subnet" : {"type": "object"},
+        "commonSettings" : {"type": "object"},
+        "storageSettings" : {"type": "object"},
+        "machineSettings" : {"type": "object"}
+    },
+    "variables": {
+        "namespace": "[parameters('commonSettings').namespace]",
+        "region": "[parameters('commonSettings').region]",
+        "adminUsername": "[parameters('commonSettings').adminUsername]",
+        "subnetRef": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('subnet').vnet), '/subnets/', parameters('subnet').name)]",
+        "vmName": "[concat(variables('namespace'), 'vm')]",
+        "vmCount": 2,
+        "nicName": "[concat(variables('namespace'), 'nic')]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[concat(variables('nicName'), copyIndex())]",
+            "location": "[variables('region')]",
+            "copy": {
+                "name": "nicCopyLoop",
+                "count": "[variables('vmCount')]"
+            },
+            "tags": {
+                "displayName": "[concat(variables('nicName'), copyIndex())]"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[concat(variables('vmName'), copyIndex())]",
+            "location": "[variables('region')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'), copyIndex())]"
+            ],
+            "tags": {
+                "displayName": "[concat(variables('vmName'), copyIndex())]"
+            },
+            "copy": {
+                "name": "vmCopyLoop",
+                "count": "[variables('vmCount')]"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('machineSettings').vmSize]"
+                },
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('machineSettings').availabilitySet)]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(variables('vmName'), copyIndex())]",
+                    "adminUsername": "[variables('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": "[parameters('osSettings')]",
+                    "osDisk": {
+                        "name": "osDisk",
+                        "vhd": {
+                            "uri": "[concat('http://', parameters('storageSettings').name, parameters('storageSettings').map[copyIndex()],'.blob.core.windows.net/vhds/', variables('vmName'), copyIndex(), '-osdisk.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    },
+                    "dataDisks": [
+                        {
+                            "name": "dataDisk1",
+                            "diskSizeGB": "1023",
+                            "lun": 0,
+                            "vhd": {
+                                "uri": "[concat('http://', parameters('storageSettings').name, parameters('storageSettings').map[copyIndex()],'.blob.core.windows.net/vhds/',variables('vmName'), copyIndex(),'-datadisk1.vhd')]"
+                            },
+                            "caching": "None",
+                            "createOption": "Empty"
+                        },
+                        {
+                            "name": "dataDisk2",
+                            "diskSizeGB": "1023",
+                            "lun": 1,
+                            "vhd": {
+                                "uri": "[concat('http://', parameters('storageSettings').name, parameters('storageSettings').map[copyIndex()],'.blob.core.windows.net/vhds/',variables('vmName'), copyIndex(),'-datadisk2.vhd')]"
+                            },
+                            "caching": "None",
+                            "createOption": "Empty"
+                         }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicName'), copyIndex()))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('http://', parameters('storageSettings').name, parameters('storageSettings').map[copyIndex()], '.blob.core.windows.net')]"
+                    }
+                }
+            }
+        }
+    ]
+}

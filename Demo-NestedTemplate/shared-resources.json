@@ -1,0 +1,87 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#", 
+    "contentVersion": "1.0.0.0", 
+    "parameters": {
+        "region": {
+            "type": "string"
+        },
+        "storageSettings": {
+            "type": "object"
+        },
+        "availabilitySetSettings": {
+            "type": "object"
+        },
+        "networkSettings": {
+            "type": "object"
+        }
+    },
+    "variables": {
+        
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[concat(parameters('storageSettings').name, copyIndex())]",
+            "apiVersion": "2015-06-15",
+            "location": "[parameters('region')]",
+            "copy": {
+                "name": "saLoop",
+                "count": "[parameters('storageSettings').count]"
+            },
+            "properties": {
+                "accountType": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/providers/locks",
+            "apiVersion": "2015-01-01",
+            "name": "[concat(parameters('storageSettings').name, copyIndex(), '/Microsoft.Authorization/storagelock')]",
+            "dependsOn": [
+                "saLoop"
+            ],
+            "copy":{
+              "name":"saLockLoop",
+              "count": "[parameters('storageSettings').count]"  
+            },
+            "properties": {
+                "level": "CannotDelete",
+                "notes": "Do not delete the storage account - used by VMs."
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2016-03-30",
+            "name": "[parameters('networkSettings').vnetName]",
+            "location": "[parameters('region')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('networkSettings').addressPrefix]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('networkSettings').subnets.data.name]",
+                        "properties": {
+                            "addressPrefix": "[parameters('networkSettings').subnets.data.prefix]"
+                        }
+                    }                    
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[parameters('availabilitySetSettings').name]",
+            "apiVersion": "2015-06-15",
+            "location": "[parameters('region')]",
+            "tags": {
+                "displayName": "[parameters('availabilitySetSettings').name]"
+            },
+            "properties": {
+                "platformFaultDomainCount": "[parameters('availabilitySetSettings').fdCount]",
+                "platformUpdateDomainCount": "[parameters('availabilitySetSettings').udCount]"
+            }
+        }
+    ],
+    "outputs": {}
+}
