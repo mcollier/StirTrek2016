@@ -1,0 +1,12 @@
+Demo #1 -- Authoring a BASIC template
+  1. Open a template in Visual Studio Code
+  2. Add a new Redis Cache via a snippet.
+     a. Explain ARM support and snippets are an extension. Resources at end of deck.
+  3. Open the same template in Visual Studio
+     a. Show JSON Outline
+     b. Add a Storage account
+  4. Deploy template via PowerShell
+  5. Deploy template via Azure CLI
+
+
+Demo #2

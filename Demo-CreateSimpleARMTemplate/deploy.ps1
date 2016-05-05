@@ -10,7 +10,7 @@ $templateParamFile = "C:\Users\mcollier\Dropbox\Presentations\Work on Your ARM S
 
 New-AzureRmResourceGroup -Name $resourceGroupName -Location $location
 
-Test-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $templateFile -TemplateParameterFile $templateParamFile -Mode Incremental
+Test-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $templateFile -TemplateParameterFile $templateParamFile -Mode Incremental -Verbose -Debug
 
 New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName `
                                    -TemplateFile $templateFile `
