@@ -1,12 +1,31 @@
+Prereqs
+1. Log into PowerShell, CLI, and Azure Portal before session!
+
+
 Demo #1 -- Authoring a BASIC template
   1. Open a template in Visual Studio Code
-  2. Add a new Redis Cache via a snippet.
+  2. Add a new Redis Cache via a snippet (arm-redis)
      a. Explain ARM support and snippets are an extension. Resources at end of deck.
-  3. Open the same template in Visual Studio
+  3. Deploy template via PowerShell (deploy.ps1)
+     	$location = "northcentralus"
+	$resourceGroupName = "stirtrek2016-webapp"
+
+	$templateFile = "C:\Users\mcollier\Dropbox\Presentations\Work on Your ARM Strength\StirTrek 2016\Demo-CreateSimpleARMTemplate\azuredeploy.json"
+	$templateParamFile = "C:\Users\mcollier\Dropbox\Presentations\Work on Your ARM Strength\StirTrek 2016\Demo-CreateSimpleARMTemplate\azuredeploy.parameters.json"
+
+	New-AzureRmResourceGroup -Name $resourceGroupName -Location $location
+
+	Test-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $templateFile -TemplateParameterFile $templateParamFile -Mode Incremental -Verbose -Debug
+
+	New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName `
+                                   -TemplateFile $templateFile `
+                                   -TemplateParameterFile $templateParamFile
+  4. Open the same template in Visual Studio
      a. Show JSON Outline
      b. Add a Storage account
-  4. Deploy template via PowerShell
   5. Deploy template via Azure CLI
+	azure login
+	azure group deployment create --resource-group "stirtrek2016-webapp" --template-file "C:\Users\mcollier\Dropbox\Presentations\Work on Your ARM Strength\StirTrek 2016\Demo-CreateSimpleARMTemplate\azuredeploy.json" --parameters-file "C:\Users\mcollier\Dropbox\Presentations\Work on Your ARM Strength\StirTrek 2016\Demo-CreateSimpleARMTemplate\azuredeploy.parameters.json"
 
 
 Demo #2
