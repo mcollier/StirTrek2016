@@ -2,6 +2,8 @@
 
 #Select-AzureRmSubscription -SubscriptionId ""
 
+# TODO: Add logic to ensure nested template files are uploaded to blob storage.
+
 $location = "northcentralus"
 $resourceGroupName = "stirtrek2016-nested"
 
