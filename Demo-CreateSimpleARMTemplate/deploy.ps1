@@ -1,6 +1,6 @@
 ﻿#Login-AzureRmAccount
 
-Select-AzureRmSubscription -SubscriptionId "0bbbc191-0023-40aa-b490-5536b2182f46"
+Select-AzureRmSubscription -SubscriptionId ""
 
 $location = "northcentralus"
 $resourceGroupName = "stirtrek2016-webapp"
