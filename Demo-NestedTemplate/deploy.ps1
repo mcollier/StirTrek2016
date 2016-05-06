@@ -10,12 +10,12 @@ $resourceGroupName = "stirtrek2016-nested"
 $templateStorageAccountName = "collierstirtrek"
 $templateStorageAccountResourceGroupName = "stirtrek2016"
 
-$templateFile = "C:\Users\mcollier\Dropbox\Presentations\Work on Your ARM Strength\StirTrek 2016\Demo-NestedTemplate\azuredeploy.json"
-$templateParamFile = "C:\Users\mcollier\Dropbox\Presentations\Work on Your ARM Strength\StirTrek 2016\Demo-NestedTemplate\azuredeploy.parameters.json"
+$templateFile = "C:\Projects\StirTrek2016\Demo-NestedTemplate\azuredeploy.json"
+$templateParamFile = "C:\Projects\StirTrek2016\Demo-NestedTemplate\azuredeploy.parameters.json"
 
 $ctx = New-AzureStorageContext -StorageAccountName $templateStorageAccountName `
                                -StorageAccountKey (Get-AzureRmStorageAccountKey -ResourceGroupName $templateStorageAccountResourceGroupName `
-                                                                                -Name $templateStorageAccountName).Key1
+                                                                                -Name $templateStorageAccountName).Value[0]
 $containerSasToken = (New-AzureStorageContainerSASToken -Container templates `
                                                         -Permission r `
                                                         -Protocol HttpsOnly `
