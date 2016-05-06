@@ -1,14 +1,16 @@
 Prereqs
 1. Log into PowerShell, CLI, and Azure Portal before session!
+2. Load up Visual Studio, Visual Studio Code, and PowerShell ISE
 
 
-Demo #1 -- Authoring a BASIC template
+Demo #1 -- Authoring a BASIC template (C:\Users\mcollier\Dropbox\Presentations\Work on Your ARM Strength\StirTrek 2016\Demo-CreateSimpleARMTemplate)
   1. Open a template in Visual Studio Code
-  2. Add a new Redis Cache via a snippet (arm-redis)
+  2. Open PowerShell ISE - deploy.ps1
+  3. Add a new Redis Cache via a snippet (arm-redis)
      a. Explain ARM support and snippets are an extension. Resources at end of deck.
-  3. Deploy template via PowerShell (deploy.ps1)
+  4. Deploy template via PowerShell (deploy.ps1)
      	$location = "northcentralus"
-	$resourceGroupName = "stirtrek2016-webapp"
+	$resourceGroupName = ""
 
 	$templateFile = "C:\Users\mcollier\Dropbox\Presentations\Work on Your ARM Strength\StirTrek 2016\Demo-CreateSimpleARMTemplate\azuredeploy.json"
 	$templateParamFile = "C:\Users\mcollier\Dropbox\Presentations\Work on Your ARM Strength\StirTrek 2016\Demo-CreateSimpleARMTemplate\azuredeploy.parameters.json"
@@ -20,12 +22,24 @@ Demo #1 -- Authoring a BASIC template
 	New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName `
                                    -TemplateFile $templateFile `
                                    -TemplateParameterFile $templateParamFile
-  4. Open the same template in Visual Studio
+  5. Open the same template in Visual Studio
      a. Show JSON Outline
      b. Add a Storage account
-  5. Deploy template via Azure CLI
+  6. Deploy template via Azure CLI
 	azure login
 	azure group deployment create --resource-group "stirtrek2016-webapp" --template-file "C:\Users\mcollier\Dropbox\Presentations\Work on Your ARM Strength\StirTrek 2016\Demo-CreateSimpleARMTemplate\azuredeploy.json" --parameters-file "C:\Users\mcollier\Dropbox\Presentations\Work on Your ARM Strength\StirTrek 2016\Demo-CreateSimpleARMTemplate\azuredeploy.parameters.json"
 
 
-Demo #2
+Demo #2 - Walkthrough of a nested template (C:\Users\mcollier\Dropbox\Presentations\Work on Your ARM Strength\StirTrek 2016\Demo-NestedTemplate)
+  1. Open folder (Demo-NestedTemplate) in Visual Studio Code
+  2. Open PowerShell ISE - deploy.ps1
+  3. Walk through files
+     a. Variables
+        1. Notice the concatentation for the ARM template URL
+        2. Notice the objects
+     b. Resources
+        1. Most of this template is 2 resource deployments - shared and the t-shirt size.
+     c. Walk through the shared-resources.json file
+     d. Walk through the 2disk-resources.json fle
+     e. Walk through deploy.ps1
+  4. Execute the deploy.ps1 script
